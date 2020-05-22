@@ -3,8 +3,7 @@ Notas <- read_excel("Notas.xlsx")
 Notas = Notas[Notas$NotaPAU!=0,]
 attach(Notas)
 
-colores <- c("Media"=heat.colors(1),"Minimo"=rainbow(1),"Cuartil1"=topo.colors(1),"Mediana"=terrain.colors(1),
-             "Cuartil3"="blue","Maximo"=cm.colors(1))
+colores_categorias=c('#FFFFFF','#FFEBBE','#FFA77F','#E64C00','#731800')
 
 #CARGAMOS INFORMACION PARA NUESTROS MAPA MUNICIPAL (AUTOMATIZADO) #MODIFICAR NOTAMEDIAH GENERAL Y VALENCIA(59)
 load("data/InstitutoG.rda")
@@ -202,39 +201,40 @@ shinyServer <- function(input, output, session){
         mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
         MatrizA$Año=as.factor(paste(MatrizA$Año))
         output$hist1_1 <- renderPlot({
-          ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+          ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                      geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist1_2 <- renderPlot({
-          ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+          ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist1_3 <- renderPlot({
-          ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+          ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                     scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                      geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist1_4 <- renderPlot({
-          ggplot() + geom_point(aes(x=Año,y=Media),data = MatrizA,shape=21,fill=rainbow(1),size=3) + 
+          ggplot() + geom_point(aes(x=Año,y=Media),data = MatrizA,shape=21,fill="#000000",size=3) + 
                         geom_line(aes(x=Año,y=Media,color="Media",group=1),data = MatrizA,lwd=1) + 
                      geom_point(aes(x=Año,y=Minimo),data = MatrizA,shape=21,fill=heat.colors(1),size=3) + 
                         geom_line(aes(x=Año,y=Minimo,color="Minimo",group=1),data = MatrizA,lwd=1) + 
-                     geom_point(aes(x=Año,y=Cuartil1),data = MatrizA,shape=21,fill=terrain.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Cuartil1),data = MatrizA,shape=21,fill="#228B22",size=3) + 
                         geom_line(aes(x=Año,y=Cuartil1,color="Cuartil1",group=1),data = MatrizA,lwd=1) + 
-                     geom_point(aes(x=Año,y=Mediana),data = MatrizA,shape=21,fill=topo.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Mediana),data = MatrizA,shape=21,fill="#FF00FF",size=3) + 
                         geom_line(aes(x=Año,y=Mediana,color="Mediana",group=1),data = MatrizA,lwd=1) + 
-                     geom_point(aes(x=Año,y=Cuartil3),data = MatrizA,shape=21,fill=cm.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Cuartil3),data = MatrizA,shape=21,fill="#1E90FF",size=3) + 
                         geom_line(aes(x=Año,y=Cuartil3,color="Cuartil3",group=1),data = MatrizA,lwd=1) +  
-                     geom_point(aes(x=Año,y=Maximo),data = MatrizA,shape=21,fill="blue",size=3) + 
+                     geom_point(aes(x=Año,y=Maximo),data = MatrizA,shape=21,fill="#FFFF00",size=3) + 
                         geom_line(aes(x=Año,y=Maximo,color="Maximo",group=1),data = MatrizA,lwd=1) + 
                      labs(x="Año", y="Nota") +
                      scale_colour_manual("", 
                                         breaks = c("Media","Minimo","Cuartil1","Mediana","Cuartil3","Maximo"),
-                                        values = c(heat.colors(1),rainbow(1),topo.colors(1),terrain.colors(1),"blue",cm.colors(1))) +
+                                        values = c("#000000",rainbow(1),"#228B22","#FF00FF","#1E90FF","#FFFF00")) +
                      theme_ipsum(axis_title_size = 20, axis_title_just = "mc") +
                      ggtitle("Evolucion Temporal")
         })
@@ -289,39 +289,40 @@ shinyServer <- function(input, output, session){
         Matriz1$Cuartil3=as.numeric(paste(Matriz1$Cuartil3))
         Matriz1$Maximo=as.numeric(paste(Matriz1$Maximo))
         output$hist2_1 <- renderPlot({
-          ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+          ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                      geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist2_2 <- renderPlot({
-          ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+          ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist2_3 <- renderPlot({
-          ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+          ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                     scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                      geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist2_4 <- renderPlot({
-          ggplot() + geom_point(aes(x=Año,y=Media),data = Matriz1,shape=21,fill=rainbow(1),size=3) + 
+          ggplot() + geom_point(aes(x=Año,y=Media),data = Matriz1,shape=21,fill="#000000",size=3) + 
                         geom_line(aes(x=Año,y=Media,color="Media",group=1),data = Matriz1,lwd=1) + 
                      geom_point(aes(x=Año,y=Minimo),data = Matriz1,shape=21,fill=heat.colors(1),size=3) + 
                         geom_line(aes(x=Año,y=Minimo,color="Minimo",group=1),data = Matriz1,lwd=1) + 
-                     geom_point(aes(x=Año,y=Cuartil1),data = Matriz1,shape=21,fill=terrain.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Cuartil1),data = Matriz1,shape=21,fill="#228B22",size=3) + 
                         geom_line(aes(x=Año,y=Cuartil1,color="Cuartil1",group=1),data = Matriz1,lwd=1) + 
-                     geom_point(aes(x=Año,y=Mediana),data = Matriz1,shape=21,fill=topo.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Mediana),data = Matriz1,shape=21,fill="#FF00FF",size=3) + 
                         geom_line(aes(x=Año,y=Mediana,color="Mediana",group=1),data = Matriz1,lwd=1) + 
-                     geom_point(aes(x=Año,y=Cuartil3),data = Matriz1,shape=21,fill=cm.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Cuartil3),data = Matriz1,shape=21,fill="#1E90FF",size=3) + 
                         geom_line(aes(x=Año,y=Cuartil3,color="Cuartil3",group=1),data = Matriz1,lwd=1) +  
-                     geom_point(aes(x=Año,y=Maximo),data = Matriz1,shape=21,fill="blue",size=3) + 
+                     geom_point(aes(x=Año,y=Maximo),data = Matriz1,shape=21,fill="#FFFF00",size=3) + 
                         geom_line(aes(x=Año,y=Maximo,color="Maximo",group=1),data = Matriz1,lwd=1) + 
                      labs(x="Año", y="Nota") +
                      scale_colour_manual("", 
                                         breaks = c("Media","Minimo","Cuartil1","Mediana","Cuartil3","Maximo"),
-                                        values = c(heat.colors(1),rainbow(1),topo.colors(1),terrain.colors(1),"blue",cm.colors(1))) +
+                                        values = c("#000000",rainbow(1),"#228B22","#FF00FF","#1E90FF","#FFFF00")) +
                      theme_ipsum(axis_title_size = 20, axis_title_just = "mc") +
                      ggtitle("Evolucion Temporal")
         })
@@ -376,39 +377,40 @@ shinyServer <- function(input, output, session){
         Matriz2$Cuartil3=as.numeric(paste(Matriz2$Cuartil3))
         Matriz2$Maximo=as.numeric(paste(Matriz2$Maximo))
         output$hist3_1 <- renderPlot({
-          ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+          ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                      geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist3_2 <- renderPlot({
-          ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+          ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist3_3 <- renderPlot({
-          ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+          ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                     scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                      geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist3_4 <- renderPlot({
-          ggplot() + geom_point(aes(x=Año,y=Media),data = Matriz2,shape=21,fill=rainbow(1),size=3) + 
+          ggplot() + geom_point(aes(x=Año,y=Media),data = Matriz2,shape=21,fill="#000000",size=3) + 
                         geom_line(aes(x=Año,y=Media,color="Media",group=1),data = Matriz2,lwd=1) + 
                      geom_point(aes(x=Año,y=Minimo),data = Matriz2,shape=21,fill=heat.colors(1),size=3) + 
                         geom_line(aes(x=Año,y=Minimo,color="Minimo",group=1),data = Matriz2,lwd=1) + 
-                     geom_point(aes(x=Año,y=Cuartil1),data = Matriz2,shape=21,fill=terrain.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Cuartil1),data = Matriz2,shape=21,fill="#228B22",size=3) + 
                         geom_line(aes(x=Año,y=Cuartil1,color="Cuartil1",group=1),data = Matriz2,lwd=1) + 
-                     geom_point(aes(x=Año,y=Mediana),data = Matriz2,shape=21,fill=topo.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Mediana),data = Matriz2,shape=21,fill="#FF00FF",size=3) + 
                         geom_line(aes(x=Año,y=Mediana,color="Mediana",group=1),data = Matriz2,lwd=1) + 
-                     geom_point(aes(x=Año,y=Cuartil3),data = Matriz2,shape=21,fill=cm.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Cuartil3),data = Matriz2,shape=21,fill="#1E90FF",size=3) + 
                         geom_line(aes(x=Año,y=Cuartil3,color="Cuartil3",group=1),data = Matriz2,lwd=1) +  
-                     geom_point(aes(x=Año,y=Maximo),data = Matriz2,shape=21,fill="blue",size=3) + 
+                     geom_point(aes(x=Año,y=Maximo),data = Matriz2,shape=21,fill="#FFFF00",size=3) + 
                         geom_line(aes(x=Año,y=Maximo,color="Maximo",group=1),data = Matriz2,lwd=1) + 
                      labs(x="Año", y="Nota") +
                      scale_colour_manual("", 
                                         breaks = c("Media","Minimo","Cuartil1","Mediana","Cuartil3","Maximo"),
-                                        values = c(heat.colors(1),rainbow(1),topo.colors(1),terrain.colors(1),"blue",cm.colors(1))) +
+                                        values = c("#000000",rainbow(1),"#228B22","#FF00FF","#1E90FF","#FFFF00")) +
                      theme_ipsum(axis_title_size = 20, axis_title_just = "mc") +
                      ggtitle("Evolucion Temporal")
         })
@@ -463,39 +465,40 @@ shinyServer <- function(input, output, session){
         Matriz3$Cuartil3=as.numeric(paste(Matriz3$Cuartil3))
         Matriz3$Maximo=as.numeric(paste(Matriz3$Maximo))
         output$hist4_1 <- renderPlot({
-          ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+          ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                      geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist4_2 <- renderPlot({
-          ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+          ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist4_3 <- renderPlot({
-          ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+          ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                     scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                      geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist4_4 <- renderPlot({
-          ggplot() + geom_point(aes(x=Año,y=Media),data = Matriz3,shape=21,fill=rainbow(1),size=3) + 
+          ggplot() + geom_point(aes(x=Año,y=Media),data = Matriz3,shape=21,fill="#000000",size=3) + 
                         geom_line(aes(x=Año,y=Media,color="Media",group=1),data = Matriz3,lwd=1) + 
                      geom_point(aes(x=Año,y=Minimo),data = Matriz3,shape=21,fill=heat.colors(1),size=3) + 
                         geom_line(aes(x=Año,y=Minimo,color="Minimo",group=1),data = Matriz3,lwd=1) + 
-                     geom_point(aes(x=Año,y=Cuartil1),data = Matriz3,shape=21,fill=terrain.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Cuartil1),data = Matriz3,shape=21,fill="#228B22",size=3) + 
                         geom_line(aes(x=Año,y=Cuartil1,color="Cuartil1",group=1),data = Matriz3,lwd=1) + 
-                     geom_point(aes(x=Año,y=Mediana),data = Matriz3,shape=21,fill=topo.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Mediana),data = Matriz3,shape=21,fill="#FF00FF",size=3) + 
                         geom_line(aes(x=Año,y=Mediana,color="Mediana",group=1),data = Matriz3,lwd=1) + 
-                     geom_point(aes(x=Año,y=Cuartil3),data = Matriz3,shape=21,fill=cm.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Cuartil3),data = Matriz3,shape=21,fill="#1E90FF",size=3) + 
                         geom_line(aes(x=Año,y=Cuartil3,color="Cuartil3",group=1),data = Matriz3,lwd=1) +  
-                     geom_point(aes(x=Año,y=Maximo),data = Matriz3,shape=21,fill="blue",size=3) + 
+                     geom_point(aes(x=Año,y=Maximo),data = Matriz3,shape=21,fill="#FFFF00",size=3) + 
                         geom_line(aes(x=Año,y=Maximo,color="Maximo",group=1),data = Matriz3,lwd=1) + 
                      labs(x="Año", y="Nota") +
                      scale_colour_manual("", 
                                         breaks = c("Media","Minimo","Cuartil1","Mediana","Cuartil3","Maximo"),
-                                        values = c(heat.colors(1),rainbow(1),topo.colors(1),terrain.colors(1),"blue",cm.colors(1))) +
+                                        values = c("#000000",rainbow(1),"#228B22","#FF00FF","#1E90FF","#FFFF00")) +
                      theme_ipsum(axis_title_size = 20, axis_title_just = "mc") +
                      ggtitle("Evolucion Temporal")
         })
@@ -542,7 +545,7 @@ shinyServer <- function(input, output, session){
         colnames(newdata)=c("Nota","Sexo")
         mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
         #PARA GRAFICAS EVOLUTIVAS
-        Matriz4=MatrizE[MatrizE$`Tipo Centro`==nombre_nivel,]
+        Matriz4=MatrizE[MatrizE$TipoCentro==nombre_nivel,]
         Matriz4$Minimo=as.numeric(paste(Matriz4$Minimo))
         Matriz4$Cuartil1=as.numeric(paste(Matriz4$Cuartil1))
         Matriz4$Mediana=as.numeric(paste(Matriz4$Mediana))
@@ -550,39 +553,40 @@ shinyServer <- function(input, output, session){
         Matriz4$Cuartil3=as.numeric(paste(Matriz4$Cuartil3))
         Matriz4$Maximo=as.numeric(paste(Matriz4$Maximo))
         output$hist5_1 <- renderPlot({
-          ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+          ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                      geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist5_2 <- renderPlot({
-          ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+          ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist5_3 <- renderPlot({
-          ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+          ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                     scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                      geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                      labs(title = paste0("NOTAS ",toupper(nombre_nivel)), x = "Notas", y = "Estudiantes") +
                      theme_gray(base_size = 14)
         })
         output$hist5_4 <- renderPlot({
-          ggplot() + geom_point(aes(x=Año,y=Media),data = Matriz4,shape=21,fill=rainbow(1),size=3) + 
+          ggplot() + geom_point(aes(x=Año,y=Media),data = Matriz4,shape=21,fill="#000000",size=3) + 
                         geom_line(aes(x=Año,y=Media,color="Media",group=1),data = Matriz4,lwd=1) + 
                      geom_point(aes(x=Año,y=Minimo),data = Matriz4,shape=21,fill=heat.colors(1),size=3) + 
                         geom_line(aes(x=Año,y=Minimo,color="Minimo",group=1),data = Matriz4,lwd=1) + 
-                     geom_point(aes(x=Año,y=Cuartil1),data = Matriz4,shape=21,fill=terrain.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Cuartil1),data = Matriz4,shape=21,fill="#228B22",size=3) + 
                         geom_line(aes(x=Año,y=Cuartil1,color="Cuartil1",group=1),data = Matriz4,lwd=1) + 
-                     geom_point(aes(x=Año,y=Mediana),data = Matriz4,shape=21,fill=topo.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Mediana),data = Matriz4,shape=21,fill="#FF00FF",size=3) + 
                         geom_line(aes(x=Año,y=Mediana,color="Mediana",group=1),data = Matriz4,lwd=1) + 
-                     geom_point(aes(x=Año,y=Cuartil3),data = Matriz4,shape=21,fill=cm.colors(1),size=3) + 
+                     geom_point(aes(x=Año,y=Cuartil3),data = Matriz4,shape=21,fill="#1E90FF",size=3) + 
                         geom_line(aes(x=Año,y=Cuartil3,color="Cuartil3",group=1),data = Matriz4,lwd=1) +  
-                     geom_point(aes(x=Año,y=Maximo),data = Matriz4,shape=21,fill="blue",size=3) + 
+                     geom_point(aes(x=Año,y=Maximo),data = Matriz4,shape=21,fill="#FFFF00",size=3) + 
                         geom_line(aes(x=Año,y=Maximo,color="Maximo",group=1),data = Matriz4,lwd=1) + 
                      labs(x="Año", y="Nota") +
                      scale_colour_manual("", 
                                         breaks = c("Media","Minimo","Cuartil1","Mediana","Cuartil3","Maximo"),
-                                        values = c(heat.colors(1),rainbow(1),topo.colors(1),terrain.colors(1),"blue",cm.colors(1))) +
+                                        values = c("#000000",rainbow(1),"#228B22","#FF00FF","#1E90FF","#FFFF00")) +
                      theme_ipsum(axis_title_size = 20, axis_title_just = "mc") +
                      ggtitle("Evolucion Temporal")
         })
@@ -633,18 +637,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -687,18 +692,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -741,18 +747,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -795,18 +802,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -849,18 +857,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -903,18 +912,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -957,18 +967,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1011,18 +1022,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1065,18 +1077,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1119,18 +1132,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1173,18 +1187,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1227,18 +1242,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1281,18 +1297,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1335,18 +1352,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1389,18 +1407,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1443,18 +1462,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1497,18 +1517,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1551,18 +1572,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1605,18 +1627,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1659,18 +1682,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1713,18 +1737,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1767,18 +1792,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1821,18 +1847,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1875,18 +1902,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1929,18 +1957,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist22_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPOS CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPOS CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist22_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPOS CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -1989,18 +2018,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2045,18 +2075,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2101,18 +2132,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2157,18 +2189,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2213,19 +2246,20 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
 
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2270,18 +2304,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2326,18 +2361,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2382,18 +2418,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2438,18 +2475,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2494,18 +2532,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2550,18 +2589,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2606,18 +2646,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2662,18 +2703,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2718,18 +2760,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2774,18 +2817,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2830,18 +2874,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2886,18 +2931,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2942,18 +2988,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -2998,18 +3045,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3054,18 +3102,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3110,18 +3159,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CURSOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3166,18 +3216,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3222,18 +3273,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3278,18 +3330,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3334,18 +3387,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3390,18 +3444,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3446,18 +3501,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3502,18 +3558,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3558,18 +3615,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3614,18 +3672,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3670,18 +3729,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3726,18 +3786,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3782,18 +3843,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3838,18 +3900,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3894,18 +3957,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -3950,18 +4014,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4006,18 +4071,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4062,18 +4128,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4118,18 +4185,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4174,18 +4242,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4230,18 +4299,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4286,18 +4356,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4342,18 +4413,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4398,18 +4470,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4454,18 +4527,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4510,18 +4584,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4566,18 +4641,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MUNICIPIOS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4622,18 +4698,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4678,18 +4755,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4734,18 +4812,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ",toupper(nombre_variable1)," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4790,18 +4869,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4846,18 +4926,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4902,18 +4983,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -4958,18 +5040,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5014,18 +5097,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5070,18 +5154,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5126,18 +5211,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5182,18 +5268,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5238,18 +5325,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5294,18 +5382,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5350,18 +5439,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5406,18 +5496,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5462,18 +5553,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5518,18 +5610,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5574,18 +5667,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5630,18 +5724,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5686,18 +5781,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5742,18 +5838,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5798,18 +5895,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5854,18 +5952,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5910,18 +6009,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -5966,18 +6066,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6022,18 +6123,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIAS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6078,18 +6180,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6134,18 +6237,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","CONVOCATORIA"," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6190,18 +6294,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6246,18 +6351,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6302,18 +6408,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6358,18 +6465,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6414,18 +6522,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6470,18 +6579,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6526,18 +6636,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6582,18 +6693,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6638,18 +6750,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6694,18 +6807,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6750,18 +6864,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6806,18 +6921,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6862,18 +6978,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6918,18 +7035,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -6974,18 +7092,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7030,18 +7149,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7086,18 +7206,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7142,18 +7263,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7198,18 +7320,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7254,18 +7377,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","TIPO CENTRO"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7310,18 +7434,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7366,18 +7491,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7422,18 +7548,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1),"-","TIPO CENTRO"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7478,18 +7605,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDADES"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","TIPO CENTRO"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7534,18 +7662,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","MODALIDAD"," ",toupper(nombre_nivel1)," - ","TIPO CENTROS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7590,18 +7719,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","CURSOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7646,18 +7776,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7702,18 +7833,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7758,18 +7890,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7814,18 +7947,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2)," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7870,18 +8004,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7926,18 +8061,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","MUNICIPIOS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -7982,18 +8118,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8038,18 +8175,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-",toupper(nombre_variable2)," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8094,18 +8232,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ",toupper(nombre_variable2),"-",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8150,18 +8289,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8206,18 +8346,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8262,18 +8403,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","CONVOCATORIAS"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8318,18 +8460,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","CONVOCATORIA"," ",toupper(nombre_nivel2),"-","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8374,18 +8517,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","CONVOCATORIA"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8430,18 +8574,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8486,18 +8631,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8542,18 +8688,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1),"-","MODALIDAD"," ",toupper(nombre_nivel2),"-","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8598,18 +8745,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTRO"," ",toupper(nombre_nivel1)," - ","MODALIDADES"," ",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8654,18 +8802,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel3)," - ","MODALIDAD"," ",toupper(nombre_nivel2)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8710,18 +8859,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8766,18 +8916,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ",toupper(nombre_variable3)," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8822,18 +8973,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","CONVOCATORIA"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8878,18 +9030,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2)," - ","MODALIDAD"," ",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -8934,18 +9087,19 @@ shinyServer <- function(input, output, session){
             colnames(newdata)=c("Nota","Sexo")
             mu <- ddply(newdata, "Sexo", summarise, grp.mean=mean(Nota))
             output$hist33_1 <- renderPlot({
-              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="lightgreen") +
+              ggplot() + geom_histogram(aes(x=datos), data=new, bins=40, color="darkblue", fill="#3EB71F") +
                          geom_vline(aes(xintercept=mean(datos)), color = "black", linetype="dashed", size=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_2 <- renderPlot({
-              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=0.7) +
+              ggplot() + geom_density(aes(x=datos), data=new, color="darkblue", fill="lightblue", alpha=1) +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
             })
             output$hist33_3 <- renderPlot({
-              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata, alpha=0.7) +
+              ggplot() + geom_density(aes(x=Nota,fill=Sexo), data=newdata) +
+                         scale_fill_manual(values = alpha(c("#87CEFA","#FFC0CB"),0.8)) +
                          geom_vline(data=mu, aes(xintercept=grp.mean, color=Sexo), linetype="dashed") +
                          labs(title = paste0("NOTAS ","TIPO CENTROS"," ",toupper(nombre_nivel1),"-",toupper(nombre_nivel2),"-",toupper(nombre_nivel3)), x = "Notas", y = "Estudiantes") +
                          theme_gray(base_size = 14)
@@ -9393,6 +9547,50 @@ shinyServer <- function(input, output, session){
                                                        minWidth = 350,
                                                        maxWidth = 350))
       })
+      })
+    }
+    if(input$Variable=="Heatmap"){
+      observeEvent(input$Categoria1,{
+        if(input$Categoria1=="Categoria_Curso"){
+          load("data/df1.rda")
+          output$MapaCalor <- renderPlot({
+            ggplot(data=df1,aes(x=ASIGNATURA,y=CURSO,fill=factor(VALOR)))+
+              geom_tile(colour="black",
+                        alpha = 0.7) +
+              scale_fill_manual(
+                values=rev(colores_categorias),
+                breaks=c("1","2","3","4","5"),
+                labels=c("MAL AÑO","AÑO REGULAR","AÑO ESTANDARD","BUEN AÑO",
+                         "GRAN AÑO"))+
+              theme_ipsum(axis_title_size = 20, axis_title_just = "mc") +
+              labs(x="ASIGNATURA", y="CURSO") + 
+              ggtitle("MAPAS COMPARATIVOS CURSO-ASIGNATURA")+
+              guides(fill=guide_legend(title="CALIDAD"))+
+              scale_x_discrete(position = "top")+
+              theme(axis.text.y = element_text(size=10))+
+              theme(axis.text.x = element_text(size=12,angle = 90))
+          })
+        }
+          if(input$Categoria1=="Categoria_Municipio"){
+            load("data/df2.rda")
+            output$MapaCalor <- renderPlot({
+            ggplot(data=df2,aes(x=ASIGNATURA,y=MUNICIPIO,fill=factor(VALOR)))+
+              geom_tile(colour="black",
+                        alpha = 0.7) +
+              scale_fill_manual(
+                values=rev(colores_categorias),
+                breaks=c("1","2","3","4","5"),
+                labels=c("MAL MUNICIPIO","MUNICIPIO REGULAR","MUNICIPIO ESTANDARD","BUEN MUNICIPIO",
+                         "GRAN MUNICIPIO"))+
+              theme_ipsum(axis_title_size = 20, axis_title_just = "mc") +
+              labs(x="ASIGNATURA", y="MUNICIPIO") + 
+              ggtitle("MAPAS COMPARATIVOS MUNICIPIO-ASIGNATURA")+
+              guides(fill=guide_legend(title="CALIDAD"))+
+              scale_x_discrete(position = "top")+
+              theme(axis.text.y = element_text(size=8))+
+              theme(axis.text.x = element_text(size=10,angle=90))
+          })
+        }
       })
     }
   })

@@ -85,7 +85,8 @@ shinyUI(dashboardPage(skin = "red",
       menuItem("Mapas Representativos", tabName="Mapas", icon=icon("images"),
                menuSubItem("Mapa General", tabName="Mapa_General", icon=icon("atlas")),
                menuSubItem("Mapa Muncicipal", tabName="Mapa_Municipal", icon=icon("map-marked")),
-               startExpanded = TRUE)
+               startExpanded = TRUE),
+      menuItem("Mapas Comparativos", tabName="Heatmap", icon=icon("balance-scale"))
     )
   ),
   dashboardBody(
@@ -1049,6 +1050,20 @@ shinyUI(dashboardPage(skin = "red",
                       ),
               mainPanel(
                 leafletOutput("MapaMunicipal",height=680,width=1150)
+              )
+      ),
+      #Last TabContent
+      tabItem(tabName = "Heatmap",
+              fluidRow(
+                box(background = "aqua",
+                    width = 6,
+                    height = 50,
+                    selectInput("Categoria1","Categoria",
+                                list("Curso" = "Categoria_Curso",
+                                     "Municipio" = "Categoria_Municipio")))
+              ),
+              mainPanel(
+                plotOutput("MapaCalor",height=750,width=1300)
               )
       )
   ))

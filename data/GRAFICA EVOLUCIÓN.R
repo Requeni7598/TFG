@@ -20,7 +20,7 @@ MatrizD <- cbind(D$Group.1,D$Group.2,D$x)
 colnames(MatrizD) = c("Año","Modalidad","Minimo","Cuartil1","Mediana","Media","Cuartil3","Maximo")
 E = as.data.frame(aggregate(NotaPAU,by=list(Curso,Ensenyanza),summary)) #Sumario para nota media por curso y centro
 MatrizE <- cbind(E$Group.1,E$Group.2,E$x)
-colnames(MatrizE) = c("Año","Tipo Centro","Minimo","Cuartil1","Mediana","Media","Cuartil3","Maximo")
+colnames(MatrizE) = c("Año","TipoCentro","Minimo","Cuartil1","Mediana","Media","Cuartil3","Maximo")
 
 save(MatrizA,file="/Users/requelui/Desktop/UNIVERSIDAD/TFG/R STUDIO/data/MatrizA.rda")
 save(MatrizB,file="/Users/requelui/Desktop/UNIVERSIDAD/TFG/R STUDIO/data/MatrizB.rda")
