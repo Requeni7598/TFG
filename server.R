@@ -1,3 +1,10 @@
+list.of.packages <- c("shiny","shinydashboard","ggplot2","readxl","leaflet","leaflet.minicharts",
+                      "leaflet.extras","mapview","rgeos","raster","rgdal","RColorBrewer","maptools","sp",
+                      "htmltools","plyr","hrbrthemes","readxl") 
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]  
+if(length(new.packages)) install.packages(new.packages)
+#INSTALACION DE PAQUETES NECESARIOS SI NO SE DISPONE DE ELLOS
+
 library(readxl)
 Notas <- read_excel("Notas.xlsx")
 Notas = Notas[Notas$NotaPAU!=0,]
@@ -9560,15 +9567,15 @@ shinyServer <- function(input, output, session){
               scale_fill_manual(
                 values=rev(colores_categorias),
                 breaks=c("1","2","3","4","5"),
-                labels=c("MAL AÑO","AÑO REGULAR","AÑO ESTANDARD","BUEN AÑO",
-                         "GRAN AÑO"))+
+                labels=c("MAL","REGULAR","ESTANDARD","BUENO",
+                         "MUY BUENO"))+
               theme_ipsum(axis_title_size = 20, axis_title_just = "mc") +
               labs(x="ASIGNATURA", y="CURSO") + 
               ggtitle("MAPAS COMPARATIVOS CURSO-ASIGNATURA")+
               guides(fill=guide_legend(title="CALIDAD"))+
               scale_x_discrete(position = "top")+
               theme(axis.text.y = element_text(size=10))+
-              theme(axis.text.x = element_text(size=12,angle = 90))
+              theme(axis.text.x = element_text(size=12,angle = 90,hjust=0,vjust=0))
           })
         }
           if(input$Categoria1=="Categoria_Municipio"){
@@ -9580,15 +9587,15 @@ shinyServer <- function(input, output, session){
               scale_fill_manual(
                 values=rev(colores_categorias),
                 breaks=c("1","2","3","4","5"),
-                labels=c("MAL MUNICIPIO","MUNICIPIO REGULAR","MUNICIPIO ESTANDARD","BUEN MUNICIPIO",
-                         "GRAN MUNICIPIO"))+
+                labels=c("MAL","REGULAR","ESTANDARD","BUENO",
+                         "MUY BUENO"))+
               theme_ipsum(axis_title_size = 20, axis_title_just = "mc") +
               labs(x="ASIGNATURA", y="MUNICIPIO") + 
               ggtitle("MAPAS COMPARATIVOS MUNICIPIO-ASIGNATURA")+
               guides(fill=guide_legend(title="CALIDAD"))+
               scale_x_discrete(position = "top")+
               theme(axis.text.y = element_text(size=8))+
-              theme(axis.text.x = element_text(size=10,angle=90))
+              theme(axis.text.x = element_text(size=10,angle=90,hjust=0,vjust=0))
           })
         }
       })

@@ -208,6 +208,7 @@ data1G <- as.data.frame(rbind("CENTRE ESPECÍFIC D'EDUCACIÓ A DISTÀNCIA","CENT
                               "I.E.S. VILAMARXANT","INSTITUCION CULTURAL DOMUS"))
 colnames(data1G)=c("Instituto") #NOMBRE INSTITUTOS
 
+#SALVO ALGUNAS PEQUEÑAS DIFERENCIAS. AHORA DEBEMOS SEGUIR UN PROCESAMIENTO SIMILAR A MAPAGENERAL.R
 
 data2G <- c()
 for (i in 1:(length(unique(Notas$Centro))-1)){ #RECORDAMOS QUE EL CENTRO TRASLADOS NO NOS INTERESA
@@ -261,6 +262,10 @@ CIUDADES <- c("ADEMUZ","ALAQUAS","ALBAIDA","ALBAL","ALBERIC","ALBORAYA","ALCASSE
               "TURÍS","UTIEL","VALENCIA","VILAMARXANT","VILLANUEVA_CASTELLON","VILLAR_DEL_ARZOBISPO")
 
 #YA TENEMOS CASO CONCRETO. EXTRAPOLAR
+#Valencia genera problemas por contar con centros de enseñanza tan solo de mujeres.
+#Tenemos un bucle if con unos comandos diferentes segun trabajemos con Valencia u otros municipios.
+#Aun asi en ambos casos los procedimientos son muy parecidos
+
 for(j in 1:length(CIUDADES)){
   if (j != 59){
   CIUDADES[j]

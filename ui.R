@@ -1,3 +1,10 @@
+list.of.packages <- c("shiny","shinydashboard","ggplot2","readxl","leaflet","leaflet.minicharts",
+                      "leaflet.extras","mapview","rgeos","raster","rgdal","RColorBrewer","maptools","sp",
+                      "htmltools","plyr","hrbrthemes","readxl") 
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]  
+if(length(new.packages)) install.packages(new.packages)
+#PAQUETES NECESARIOS QUE SE INSTALAN DIRECTAMENTE SI NO SE DISPONE DE ELLOS
+
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
@@ -84,7 +91,7 @@ shinyUI(dashboardPage(skin = "red",
       menuItem("Análisis 3 Variables", tabName="Variable3", icon=icon("chess-knight")),
       menuItem("Mapas Representativos", tabName="Mapas", icon=icon("images"),
                menuSubItem("Mapa General", tabName="Mapa_General", icon=icon("atlas")),
-               menuSubItem("Mapa Muncicipal", tabName="Mapa_Municipal", icon=icon("map-marked")),
+               menuSubItem("Mapa Municipal", tabName="Mapa_Municipal", icon=icon("map-marked")),
                startExpanded = TRUE),
       menuItem("Mapas Comparativos", tabName="Heatmap", icon=icon("balance-scale"))
     )

@@ -11,11 +11,15 @@ for(i in 1:length(Ciudad)){
 }
 Poblacion = as.data.frame(Poblacion)
 Poblacion$Poblacion=as.character(Poblacion$Poblacion)
+
+#Quitamos algunos espacios en blanco que aparecen con trimws
 for(i in 1:dim(Poblacion)[1]){
         Poblacion$Poblacion[i]=trimws(Poblacion$Poblacion[i])
         print(i)
 }
 table(Poblacion$Poblacion)
+
+#Hacemos algunos pequeñas modificaciones ortográficas
 which(Poblacion$Poblacion=="BENETUSER")
 for(i in which(Poblacion$Poblacion=="BENETUSER")){
         Poblacion$Poblacion[i]="BENETUSSER"
@@ -89,10 +93,11 @@ for(i in which(Poblacion$Poblacion=="Turís")){
 save(Poblacion,file="/Users/requelui/Desktop/UNIVERSIDAD/TFG/R STUDIO/Poblacion.rda")
 load("Poblacion.rda")
 Notas=cbind(Notas,Poblacion)
+#YA TENEMOS LA VARIABLE POBLACION QUE BUSCABAMOS
 
 #OBTENCION HEATMAP
-colores_categorias=c('#FFFFFF','#FFEBBE','#FFA77F','#E64C00','#731800')
-Notas$Materia = as.factor(Notas$Materia)
+colores_categorias=c('#FFFFFF','#FFEBBE','#FFA77F','#E64C00','#731800') #Colores categorias
+Notas$Materia = as.factor(Notas$Materia) #Definimos materia como tipo factor
 ASIG=c("Biología","Castellano: Lengua y Literatura II","Ciencias de la Tierra y Medioambientales","Dibujo Técnico II",
        "Economía de la Empresa","Física","Geografía","Historia de España","Historia de la Filosofía","Historia del Arte",
        "Inglés","Latín II","Literatura Universal","Matemáticas aplicadas a las Ciencias Sociales","Matemáticas II",
@@ -105,30 +110,34 @@ MUN=c("Ademuz","Alaquas","Albaida","Albal","Alberic","Alboraya","Alcasser","Alfa
       "Massamagrell","Massanassa","Mislata","Moncada","Montecañada-Paterna","Oliva","Ontinyent","Paterna",
       "Picassent","Pobla de Farnals","Puzol","Rafelbunyol","Requena","Sedavi","Silla","Sueca","Tavernes Blanques",
       "Tavernes de Valldigna","Turís","Utiel","Valencia","Vilamarxant","Villanueva de Castellón","Villar del Arzobispo")
+#Definimos los cursos, municipios y asignaturas con los que trabajamos
 
 FINAL1 = c()
 for(i in 1:length(ASIG)){#Table funciona mejor que Unique o Levels
         NotaMAT = Notas[Notas$Materia==ASIG[i],]
         Mark = aggregate(NotaMAT$NmDef,list(NotaMAT$Curso),mean)
         FINAL1 = cbind(FINAL1,Mark$x)
-}
+}#Recogemos la nota media de las asignaturas por curso
 FINAL1=as.data.frame(FINAL1)
 DATOSESP1=c()
 for (i in 1:dim(FINAL1)[2]){
   FINALESP1=mean(FINAL1[,i])
   FINALESP1=rep(FINALESP1,length(CURSO))
   DATOSESP1=cbind(DATOSESP1,FINALESP1)
-}
+}#Recogemos aquí la nota media global de cada asignatura.
+#La repetimos a traves de los distintos cursos para las posteriores comparaciones
 DATOSESP1=as.data.frame(DATOSESP1)
 valor=c()
 for (j in c(1:ncol(FINAL1))){
   valor=c(valor,rev(as.numeric(FINAL1[,j])))
 }
+#Rellenamos los valores con las notas medias por curso y asignatura
 valor_se=c()
 for (j in c(1:ncol(DATOSESP1))){
   valor_se=c(valor_se,rev(as.numeric(DATOSESP1[,j])))
 }
-valor_rec=rep(NA,length(valor))
+#Rellenamos los valores con las notas medias generales
+valor_rec=rep(NA,length(valor)) #Aqui asignaremos nuestros colores
 for (j in c(1:length(valor))){
     if (valor[j]>=valor_se[j]+0.5){valor_rec[j]=5}
     else if (valor[j]>=valor_se[j]+0.2 & valor[j]<valor_se[j]+0.5){valor_rec[j]=4}
@@ -136,6 +145,7 @@ for (j in c(1:length(valor))){
     else if (valor[j]>=valor_se[j]-0.5 & valor[j]<valor_se[j]-0.2){valor_rec[j]=2}
     else if (valor[j]<=valor_se[j]-0.5){valor_rec[j]=1}
 }
+#Bucle para asignar categorias y colores en funcion de nuestros intereses.
 CURSO=rev(CURSO)
 CURSO=as.character(CURSO)
 ASIG=as.character(ASIG)
@@ -145,6 +155,8 @@ print(length(valor))
 df1=cbind(df1,valor_rec)
 colnames(df1)=c("CURSO","ASIGNATURA","VALOR")
 save(df1,file="/Users/requelui/Desktop/UNIVERSIDAD/TFG/R STUDIO/df1.rda")
+#Tras unas ultimas modificaciones ya tenemos nuestro expand grid como queremos
+#La creacion de la grafica, aunque mostramos aqui, se realiza finalmente en server.R
 G=ggplot(data=df1,aes(x=ASIGNATURA,y=CURSO,fill=factor(VALOR)))+
   geom_tile(colour="black",
             alpha = 0.7) +
@@ -160,6 +172,7 @@ G=ggplot(data=df1,aes(x=ASIGNATURA,y=CURSO,fill=factor(VALOR)))+
   theme(axis.text.y = element_text(size=10))+
   theme(axis.text.x = element_text(size=10,angle = 90))
 
+#Repetimos exactamente el mismo procedimiento a nivel de poblacion (Municipio)
 FINAL2 = c()
 for(i in 1:length(ASIG)){#Table funciona mejor que Unique o Levels
         NotaMAT = Notas[Notas$Materia==ASIG[i],]        

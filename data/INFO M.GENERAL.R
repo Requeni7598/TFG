@@ -104,7 +104,7 @@ data3G <- as.data.frame(t(data3G))
 colnames(data3G)=c("NotaMedia")
 
 info4G = aggregate(Notas$NotaPAU, list(Notas$Municipio,Notas$Sexo), mean) #NOTA MEDIA POR MUNICIPIO Y SEXO
-info4G = info4G[info4G$Group.2=="H",]
+info4G = info4G[info4G$Group.2=="H",] #NOTA MEDIA HOMBRES
 data4G <- c()
 for (i in 1:length(unique(Notas$Municipio))){
   data4G <- as.data.frame(cbind(data4G,info4G$x[i]))
@@ -113,7 +113,7 @@ data4G <- as.data.frame(t(data4G))
 colnames(data4G)=c("NotaMediaH")
 
 info5G = aggregate(Notas$NotaPAU, list(Notas$Municipio,Notas$Sexo), mean) #NOTA MEDIA POR MUNICIPIO Y SEXO
-info5G = info5G[info5G$Group.2=="M",]
+info5G = info5G[info5G$Group.2=="M",] #NOTA MEDIA MUJERES
 data5G <- c()
 for (i in 1:length(unique(Notas$Municipio))){
   data5G <- as.data.frame(cbind(data5G,info5G$x[i]))
@@ -141,6 +141,9 @@ for (j in 1:length(CURSOS)){
   MUNICIPIOSA = MUNICIPIOSA[order(MUNICIPIOSA$MUNICIPIOSA),] #ORDEN ALFABETICO
   MUNICIPIOSA = as.data.frame(MUNICIPIOSA)
   MUNICIPIOSA$MUNICIPIOSA = as.character(MUNICIPIOSA$MUNICIPIOSA)
+  #Repetimos lo mismo varias veces obligados por cambios en la estructura que se producen al ejecutar ciertas lineas
+  
+  #A PARTIR DE AQUI EL PROCEDIMIENTO ES SIMILAR AL ANTERIOR. REPETIMOS EL MISMO BUCLE PARA CADA CURSO DE INTERES
   COORDENADAS <- c()
   for(i in 1:dim(MUNICIPIOSA)[1]){
     DATOS=which(data1G==MUNICIPIOSA[i,1])
